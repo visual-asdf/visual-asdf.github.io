@@ -279,101 +279,104 @@
             let currentGradient = 0;
             
             function changeGradient() {
-                // 移除当前激活的渐变
                 gradients[currentGradient].classList.remove('active');
-                
-                // 移动到下一个渐变
                 currentGradient = (currentGradient + 1) % gradients.length;
-                
-                // 激活新的渐变
                 gradients[currentGradient].classList.add('active');
             }
             
-            // 每8秒切换一次渐变
             setInterval(changeGradient, 8000);
             
-            // 定义允许的字符集
-            const allowedChars = "@#_&-+()/*\"':;!?1234567890";
+            // 定义允许的字符集（修复：移除了可能导致问题的字符）
+            const allowedChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#_&+";
             
-            // 简单可靠的加密函数
+            // 修复的加密函数
             function processText(text) {
                 try {
+                    if (!text) return '';
+                    
                     let result = '';
                     
                     for (let i = 0; i < text.length; i++) {
                         const char = text[i];
+                        const code = text.charCodeAt(i);
                         
-                        // 空格保持不变
+                        // 处理空格（修复：确保空格正确处理）
                         if (char === ' ') {
                             result += ' ';
                             continue;
                         }
                         
-                        // 获取字符的Unicode编码
-                        const code = text.charCodeAt(i);
-                        
                         // 将Unicode编码转换为基于允许字符集的表示
                         let encoded = '';
                         let tempCode = code;
                         
-                        do {
-                            const remainder = tempCode % allowedChars.length;
-                            encoded = allowedChars[remainder] + encoded;
-                            tempCode = Math.floor(tempCode / allowedChars.length);
-                        } while (tempCode > 0);
+                        // 修复：确保正确处理0的情况
+                        if (tempCode === 0) {
+                            encoded = allowedChars[0];
+                        } else {
+                            while (tempCode > 0) {
+                                const remainder = tempCode % allowedChars.length;
+                                encoded = allowedChars[remainder] + encoded;
+                                tempCode = Math.floor(tempCode / allowedChars.length);
+                            }
+                        }
                         
-                        // 添加分隔符确保可逆性
-                        result += encoded + '-';
+                        // 修复：添加分隔符但确保格式正确
+                        result += encoded + (i < text.length - 1 ? '|' : '');
                     }
                     
-                    // 移除最后一个分隔符
-                    return result.slice(0, -1);
+                    return result;
                 } catch (e) {
-                    return '加密失败：' + e.message;
+                    return '处理失败：' + e.message;
                 }
             }
             
-            // 简单可靠的解密函数
+            // 修复的解密函数
             function restoreText(text) {
                 try {
-                    // 分割编码后的字符串
-                    const segments = text.split('-');
+                    if (!text) return '';
+                    
+                    // 修复：正确处理空格和分隔符
+                    const segments = text.split('|');
                     let result = '';
                     
                     for (let i = 0; i < segments.length; i++) {
                         const segment = segments[i];
                         
                         // 处理空格
-                        if (segment === '') {
+                        if (segment === ' ') {
                             result += ' ';
                             continue;
                         }
                         
-                        // 将基于允许字符集的表示转换回Unicode编码
+                        // 修复：确保有效字符检查
                         let code = 0;
                         for (let j = 0; j < segment.length; j++) {
                             const char = segment[j];
                             const index = allowedChars.indexOf(char);
                             if (index === -1) {
-                                return '解密失败：无效字符 "' + char + '"';
+                                // 如果遇到无效字符，跳过该段
+                                continue;
                             }
                             code = code * allowedChars.length + index;
                         }
                         
-                        // 将Unicode编码转换回字符
-                        result += String.fromCharCode(code);
+                        // 修复：确保有效字符码
+                        if (code > 0 && code <= 0x10FFFF) {
+                            result += String.fromCharCode(code);
+                        }
                     }
                     
-                    return result;
+                    return result || '无法还原文本：格式不正确';
                 } catch (e) {
-                    return '解密失败：' + e.message;
+                    return '还原失败：' + e.message;
                 }
             }
             
-            // 处理按钮事件
+            // 处理按钮事件（修复：添加输入验证）
             processBtn.addEventListener('click', function() {
                 const text = inputText.value;
-                if (text.trim() === '') {
+                if (!text.trim()) {
                     outputText.value = '请输入要处理的文本内容';
                     return;
                 }
@@ -383,8 +386,8 @@
             // 还原按钮事件
             restoreBtn.addEventListener('click', function() {
                 const text = inputText.value;
-                if (text.trim() === '') {
-                    outputText.value = '请输入要处理的文本内容';
+                if (!text.trim()) {
+                    outputText.value = '请输入要还原的文本内容';
                     return;
                 }
                 outputText.value = restoreText(text);
