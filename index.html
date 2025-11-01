@@ -14,86 +14,31 @@
         }
         
         body {
-            background: 
-                radial-gradient(circle at 10% 20%, rgba(255, 0, 110, 0.7) 0%, transparent 30%),
-                radial-gradient(circle at 90% 30%, rgba(131, 56, 236, 0.7) 0%, transparent 35%),
-                radial-gradient(circle at 50% 80%, rgba(58, 134, 255, 0.7) 0%, transparent 40%),
-                radial-gradient(circle at 20% 70%, rgba(56, 176, 0, 0.7) 0%, transparent 35%),
-                radial-gradient(circle at 80% 10%, rgba(255, 158, 0, 0.7) 0%, transparent 30%),
-                linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
-            background-size: 100% 100%;
-            background-attachment: fixed;
+            background: linear-gradient(135deg, #11998e, #38ef7d);
             color: #333;
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
             padding: 20px;
-            position: relative;
-            overflow-x: hidden;
-        }
-        
-        /* 创建动态移动的渐变焦点 */
-        body::before, body::after {
-            content: '';
-            position: absolute;
-            width: 80vmax;
-            height: 80vmax;
-            border-radius: 50%;
-            background: radial-gradient(circle, rgba(255, 0, 110, 0.4) 0%, transparent 70%);
-            z-index: -1;
-            animation: float 25s infinite linear;
-        }
-        
-        body::before {
-            top: -30vmax;
-            left: -20vmax;
-            animation-delay: 0s;
-        }
-        
-        body::after {
-            bottom: -30vmax;
-            right: -20vmax;
-            background: radial-gradient(circle, rgba(58, 134, 255, 0.4) 0%, transparent 70%);
-            animation-delay: -12.5s;
-            animation-direction: reverse;
-        }
-        
-        @keyframes float {
-            0% {
-                transform: translate(0, 0) rotate(0deg);
-            }
-            25% {
-                transform: translate(5vw, 10vh) rotate(90deg);
-            }
-            50% {
-                transform: translate(10vw, 5vh) rotate(180deg);
-            }
-            75% {
-                transform: translate(5vw, -5vh) rotate(270deg);
-            }
-            100% {
-                transform: translate(0, 0) rotate(360deg);
-            }
+            transition: background 1.5s ease;
         }
         
         .container {
             width: 100%;
             max-width: 800px;
-            background-color: rgba(255, 255, 255, 0.92);
+            background-color: rgba(255, 255, 255, 0.95);
             border-radius: 12px;
             box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
             overflow: hidden;
-            backdrop-filter: blur(10px);
-            position: relative;
-            z-index: 1;
         }
         
         header {
-            background: linear-gradient(to right, #ff006e, #8338ec);
+            background: linear-gradient(to right, #11998e, #38ef7d);
             color: white;
             padding: 25px;
             text-align: center;
+            transition: background 1.5s ease;
         }
         
         h1 {
@@ -137,9 +82,9 @@
         
         textarea:focus {
             outline: none;
-            border-color: #8338ec;
+            border-color: #11998e;
             background-color: #fff;
-            box-shadow: 0 0 0 3px rgba(131, 56, 236, 0.1);
+            box-shadow: 0 0 0 3px rgba(17, 153, 142, 0.1);
         }
         
         .output-group textarea {
@@ -163,33 +108,18 @@
             cursor: pointer;
             transition: all 0.3s;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            position: relative;
-            overflow: hidden;
-        }
-        
-        button::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-            transition: 0.5s;
-        }
-        
-        button:hover::before {
-            left: 100%;
         }
         
         #processBtn {
-            background: linear-gradient(to right, #ff006e, #8338ec);
+            background: linear-gradient(to right, #11998e, #38ef7d);
             color: white;
+            transition: background 1.5s ease;
         }
         
         #restoreBtn {
-            background: linear-gradient(to right, #3a86ff, #38b000);
+            background: linear-gradient(to right, #38ef7d, #11998e);
             color: white;
+            transition: background 1.5s ease;
         }
         
         #clearBtn {
@@ -218,11 +148,10 @@
         @media (max-width: 600px) {
             .button-group {
                 flex-direction: column;
-                align-items: center;
             }
             
             button {
-                width: 80%;
+                width: 100%;
             }
         }
     </style>
@@ -253,7 +182,7 @@
         </div>
         
         <footer>
-            <p>© 2025 文本处理程序 | 专业 · 可靠 · 安全</p>
+            <p>© 2025 文本处理程序 | Zhang Jiayi</p>
         </footer>
     </div>
 
@@ -265,48 +194,104 @@
             const restoreBtn = document.getElementById('restoreBtn');
             const clearBtn = document.getElementById('clearBtn');
             
-            // 定义允许的字符集
-            const allowedChars = "@#_&-+()/*\"':;!?1234567890";
+            // 渐变颜色变化函数
+            function updateGradient() {
+                const now = new Date();
+                const seconds = now.getSeconds();
+                const percent = (seconds % 30) / 30; // 每30秒一个循环
+                
+                // 在绿蓝渐变范围内变化
+                const hueShift = percent * 60; // 在60度色相范围内变化
+                const startHue = (120 + hueShift) % 360; // 起始绿色
+                const endHue = (180 + hueShift) % 360; // 结束蓝色
+                
+                // 转换为HSL颜色
+                const startColor = `hsl(${startHue}, 70%, 45%)`;
+                const endColor = `hsl(${endHue}, 70%, 55%)`;
+                
+                // 应用渐变
+                document.body.style.background = `linear-gradient(135deg, ${startColor}, ${endColor})`;
+                document.querySelector('header').style.background = `linear-gradient(to right, ${startColor}, ${endColor})`;
+                processBtn.style.background = `linear-gradient(to right, ${startColor}, ${endColor})`;
+                restoreBtn.style.background = `linear-gradient(to right, ${endColor}, ${startColor})`;
+            }
             
-            // 处理文本函数 - 使用Base64编码并转换为允许的字符
+            // 每2秒更新一次渐变，减少性能消耗
+            setInterval(updateGradient, 2000);
+            updateGradient(); // 初始调用
+            
+            // 增强的字符处理函数
             function processText(text) {
-                // 将文本转换为Base64
-                const base64 = btoa(unescape(encodeURIComponent(text)));
-                
-                // 将Base64字符映射到允许的字符集
                 let result = '';
-                for (let i = 0; i < base64.length; i++) {
-                    const charCode = base64.charCodeAt(i);
-                    // 使用模运算将字符映射到允许的字符集
-                    const index = charCode % allowedChars.length;
-                    result += allowedChars[index];
+                for (let i = 0; i < text.length; i++) {
+                    const char = text[i];
+                    
+                    // 空格保持不变
+                    if (char === ' ') {
+                        result += ' ';
+                        continue;
+                    }
+                    
+                    // 获取字符的Unicode编码
+                    const code = text.charCodeAt(i);
+                    
+                    // 使用多层变换增强安全性
+                    let transformedCode = code;
+                    
+                    // 第一层变换：基于位置的异或操作
+                    transformedCode ^= (i % 256);
+                    
+                    // 第二层变换：质数乘法
+                    transformedCode = (transformedCode * 65537) % 65536;
+                    
+                    // 第三层变换：位旋转
+                    transformedCode = ((transformedCode << 5) | (transformedCode >>> 11)) & 0xFFFF;
+                    
+                    // 第四层变换：添加固定盐值
+                    transformedCode = (transformedCode + 12345) % 65536;
+                    
+                    // 确保编码在有效范围内
+                    if (transformedCode < 0) transformedCode += 65536;
+                    
+                    result += String.fromCharCode(transformedCode);
                 }
-                
                 return result;
             }
             
             // 还原文本函数
             function restoreText(text) {
-                try {
-                    // 将允许的字符集映射回Base64字符
-                    let base64 = '';
-                    for (let i = 0; i < text.length; i++) {
-                        const char = text[i];
-                        const index = allowedChars.indexOf(char);
-                        if (index === -1) {
-                            throw new Error('无效的加密字符');
-                        }
-                        // 由于我们使用了模运算，无法直接还原原始Base64字符
-                        // 所以我们需要使用一种可逆的映射方法
-                        // 这里我们使用简单的ASCII码偏移
-                        base64 += String.fromCharCode(65 + index);
+                let result = '';
+                for (let i = 0; i < text.length; i++) {
+                    const char = text[i];
+                    
+                    // 空格保持不变
+                    if (char === ' ') {
+                        result += ' ';
+                        continue;
                     }
                     
-                    // 将Base64解码为原始文本
-                    return decodeURIComponent(escape(atob(base64)));
-                } catch (e) {
-                    return '解密失败：无效的加密文本';
+                    // 获取字符的Unicode编码
+                    let code = text.charCodeAt(i);
+                    
+                    // 逆向第四层变换：减去固定盐值
+                    code = (code - 12345 + 65536) % 65536;
+                    
+                    // 逆向第三层变换：反向位旋转
+                    code = ((code >>> 5) | (code << 11)) & 0xFFFF;
+                    
+                    // 逆向第二层变换：乘以模逆元
+                    // 65537在模65536下的逆元是自身，因为65537*65537 ≡ 1 (mod 65536)
+                    code = (code * 65537) % 65536;
+                    
+                    // 逆向第一层变换：基于位置的异或操作（异或操作是可逆的）
+                    code ^= (i % 256);
+                    
+                    // 确保编码在有效范围内
+                    if (code < 0) code += 65536;
+                    
+                    result += String.fromCharCode(code);
                 }
+                return result;
             }
             
             // 处理按钮事件
