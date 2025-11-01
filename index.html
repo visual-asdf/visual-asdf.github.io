@@ -14,11 +14,11 @@
         
         body {
             background: 
-                radial-gradient(circle at 10% 20%, rgba(255, 0, 110, 0.7) 0%, transparent 30%),
-                radial-gradient(circle at 90% 30%, rgba(131, 56, 236, 0.7) 0%, transparent 35%),
-                radial-gradient(circle at 50% 80%, rgba(58, 134, 255, 0.7) 0%, transparent 40%),
-                radial-gradient(circle at 20% 70%, rgba(56, 176, 0, 0.7) 0%, transparent 35%),
-                radial-gradient(circle at 80% 10%, rgba(255, 158, 0, 0.7) 0%, transparent 30%),
+                radial-gradient(circle at 10% 20%, rgba(255, 0, 110, 0.8) 0%, transparent 25%),
+                radial-gradient(circle at 90% 30%, rgba(131, 56, 236, 0.7) 0%, transparent 30%),
+                radial-gradient(circle at 50% 80%, rgba(58, 134, 255, 0.6) 0%, transparent 35%),
+                radial-gradient(circle at 20% 70%, rgba(56, 176, 0, 0.6) 0%, transparent 30%),
+                radial-gradient(circle at 80% 10%, rgba(255, 158, 0, 0.7) 0%, transparent 25%),
                 linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
             background-size: 100% 100%;
             background-attachment: fixed;
@@ -30,49 +30,54 @@
             padding: 20px;
             position: relative;
             overflow-x: hidden;
+            animation: gradientShift 15s ease infinite;
         }
         
-        /* 创建动态移动的渐变焦点 */
-        body::before, body::after {
-            content: '';
-            position: absolute;
-            width: 80vmax;
-            height: 80vmax;
-            border-radius: 50%;
-            background: radial-gradient(circle, rgba(255, 0, 110, 0.4) 0%, transparent 70%);
-            z-index: -1;
-            animation: float 25s infinite linear;
-        }
-        
-        body::before {
-            top: -30vmax;
-            left: -20vmax;
-            animation-delay: 0s;
-        }
-        
-        body::after {
-            bottom: -30vmax;
-            right: -20vmax;
-            background: radial-gradient(circle, rgba(58, 134, 255, 0.4) 0%, transparent 70%);
-            animation-delay: -12.5s;
-            animation-direction: reverse;
-        }
-        
-        @keyframes float {
+        @keyframes gradientShift {
             0% {
-                transform: translate(0, 0) rotate(0deg);
+                background: 
+                    radial-gradient(circle at 10% 20%, rgba(255, 0, 110, 0.8) 0%, transparent 25%),
+                    radial-gradient(circle at 90% 30%, rgba(131, 56, 236, 0.7) 0%, transparent 30%),
+                    radial-gradient(circle at 50% 80%, rgba(58, 134, 255, 0.6) 0%, transparent 35%),
+                    radial-gradient(circle at 20% 70%, rgba(56, 176, 0, 0.6) 0%, transparent 30%),
+                    radial-gradient(circle at 80% 10%, rgba(255, 158, 0, 0.7) 0%, transparent 25%),
+                    linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
             }
             25% {
-                transform: translate(5vw, 10vh) rotate(90deg);
+                background: 
+                    radial-gradient(circle at 30% 40%, rgba(255, 0, 110, 0.8) 0%, transparent 25%),
+                    radial-gradient(circle at 70% 60%, rgba(131, 56, 236, 0.7) 0%, transparent 30%),
+                    radial-gradient(circle at 60% 20%, rgba(58, 134, 255, 0.6) 0%, transparent 35%),
+                    radial-gradient(circle at 40% 90%, rgba(56, 176, 0, 0.6) 0%, transparent 30%),
+                    radial-gradient(circle at 90% 50%, rgba(255, 158, 0, 0.7) 0%, transparent 25%),
+                    linear-gradient(135deg, #16213e, #0f3460, #1a1a2e);
             }
             50% {
-                transform: translate(10vw, 5vh) rotate(180deg);
+                background: 
+                    radial-gradient(circle at 50% 30%, rgba(255, 0, 110, 0.8) 0%, transparent 25%),
+                    radial-gradient(circle at 10% 70%, rgba(131, 56, 236, 0.7) 0%, transparent 30%),
+                    radial-gradient(circle at 80% 80%, rgba(58, 134, 255, 0.6) 0%, transparent 35%),
+                    radial-gradient(circle at 30% 10%, rgba(56, 176, 0, 0.6) 0%, transparent 30%),
+                    radial-gradient(circle at 70% 40%, rgba(255, 158, 0, 0.7) 0%, transparent 25%),
+                    linear-gradient(135deg, #0f3460, #1a1a2e, #16213e);
             }
             75% {
-                transform: translate(5vw, -5vh) rotate(270deg);
+                background: 
+                    radial-gradient(circle at 70% 10%, rgba(255, 0, 110, 0.8) 0%, transparent 25%),
+                    radial-gradient(circle at 20% 50%, rgba(131, 56, 236, 0.7) 0%, transparent 30%),
+                    radial-gradient(circle at 40% 70%, rgba(58, 134, 255, 0.6) 0%, transparent 35%),
+                    radial-gradient(circle at 90% 30%, rgba(56, 176, 0, 0.6) 0%, transparent 30%),
+                    radial-gradient(circle at 10% 80%, rgba(255, 158, 0, 0.7) 0%, transparent 25%),
+                    linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
             }
             100% {
-                transform: translate(0, 0) rotate(360deg);
+                background: 
+                    radial-gradient(circle at 10% 20%, rgba(255, 0, 110, 0.8) 0%, transparent 25%),
+                    radial-gradient(circle at 90% 30%, rgba(131, 56, 236, 0.7) 0%, transparent 30%),
+                    radial-gradient(circle at 50% 80%, rgba(58, 134, 255, 0.6) 0%, transparent 35%),
+                    radial-gradient(circle at 20% 70%, rgba(56, 176, 0, 0.6) 0%, transparent 30%),
+                    radial-gradient(circle at 80% 10%, rgba(255, 158, 0, 0.7) 0%, transparent 25%),
+                    linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
             }
         }
         
@@ -267,44 +272,60 @@
             // 定义允许的字符集
             const allowedChars = "@#_&-+()/*\"':;!?1234567890";
             
-            // 处理文本函数 - 使用Base64编码并转换为允许的字符
+            // 改进的加密函数
             function processText(text) {
-                // 将文本转换为Base64
-                const base64 = btoa(unescape(encodeURIComponent(text)));
-                
-                // 将Base64字符映射到允许的字符集
-                let result = '';
-                for (let i = 0; i < base64.length; i++) {
-                    const charCode = base64.charCodeAt(i);
-                    // 使用模运算将字符映射到允许的字符集
-                    const index = charCode % allowedChars.length;
-                    result += allowedChars[index];
+                try {
+                    // 将文本转换为Base64
+                    const base64 = btoa(unescape(encodeURIComponent(text)));
+                    
+                    // 将Base64字符映射到允许的字符集
+                    let result = '';
+                    for (let i = 0; i < base64.length; i++) {
+                        const charCode = base64.charCodeAt(i);
+                        // 使用模运算将字符映射到允许的字符集
+                        const index = charCode % allowedChars.length;
+                        result += allowedChars[index];
+                    }
+                    
+                    return result;
+                } catch (e) {
+                    return '加密失败：输入文本无效';
                 }
-                
-                return result;
             }
             
-            // 还原文本函数
+            // 改进的解密函数
             function restoreText(text) {
                 try {
-                    // 将允许的字符集映射回Base64字符
+                    // 检查输入是否只包含允许的字符
+                    for (let i = 0; i < text.length; i++) {
+                        if (!allowedChars.includes(text[i])) {
+                            throw new Error('无效的加密字符: ' + text[i]);
+                        }
+                    }
+                    
+                    // 将加密文本映射回Base64
                     let base64 = '';
                     for (let i = 0; i < text.length; i++) {
                         const char = text[i];
                         const index = allowedChars.indexOf(char);
-                        if (index === -1) {
-                            throw new Error('无效的加密字符');
+                        // 由于原始映射使用了模运算，我们需要找到可能的原始字符代码
+                        // 这里我们假设原始Base64字符的代码在43到122之间（Base64字符范围）
+                        let found = false;
+                        for (let code = 43; code <= 122 && !found; code++) {
+                            if (code % allowedChars.length === index) {
+                                base64 += String.fromCharCode(code);
+                                found = true;
+                            }
                         }
-                        // 由于我们使用了模运算，无法直接还原原始Base64字符
-                        // 所以我们需要使用一种可逆的映射方法
-                        // 这里我们使用简单的ASCII码偏移
-                        base64 += String.fromCharCode(65 + index);
+                        if (!found) {
+                            throw new Error('无法映射字符: ' + char);
+                        }
                     }
                     
                     // 将Base64解码为原始文本
                     return decodeURIComponent(escape(atob(base64)));
                 } catch (e) {
-                    return '解密失败：无效的加密文本';
+                    return '解密失败：' + e.message;
                 }
             }
             
