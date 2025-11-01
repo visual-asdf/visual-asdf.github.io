@@ -22,7 +22,6 @@
             padding: 20px;
             position: relative;
             overflow-x: hidden;
-            transition: background 8s ease-in-out;
         }
         
         .gradient-layer {
@@ -34,6 +33,8 @@
             opacity: 0;
             transition: opacity 8s ease-in-out;
             z-index: -1;
+            background-size: 100% 100%;
+            background-attachment: fixed;
         }
         
         .gradient-1 {
@@ -288,78 +289,72 @@
                 gradients[currentGradient].classList.add('active');
             }
             
-            // 每10秒切换一次渐变
-            setInterval(changeGradient, 10000);
+            // 每8秒切换一次渐变
+            setInterval(changeGradient, 8000);
             
             // 定义允许的字符集
             const allowedChars = "@#_&-+()/*\"':;!?1234567890";
             
-            // 完全重写的加密函数 - 使用简单的字符替换方法
+            // 修复的加密函数 - 使用Base64和字符映射
             function processText(text) {
-                let result = '';
-                for (let i = 0; i < text.length; i++) {
-                    const char = text[i];
-                    
-                    // 空格保持不变
-                    if (char === ' ') {
-                        result += ' ';
-                        continue;
-                    }
-                    
-                    // 获取字符的Unicode编码
-                    const code = text.charCodeAt(i);
-                    
-                    // 使用简单的替换算法
-                    // 将Unicode编码转换为基于允许字符集的表示
-                    let tempCode = code;
-                    let encoded = '';
-                    
-                    // 将编码转换为基于允许字符集的"数字"
-                    do {
-                        const remainder = tempCode % allowedChars.length;
-                        encoded = allowedChars[remainder] + encoded;
-                        tempCode = Math.floor(tempCode / allowedChars.length);
-                    } while (tempCode > 0);
-                    
-                    // 添加分隔符确保可逆性
-                    result += encoded + (i < text.length - 1 ? '-' : '');
-                }
-                
-                return result;
-            }
-            
-            // 完全重写的解密函数
-            function restoreText(text) {
                 try {
-                    // 分割编码后的字符串
-                    const segments = text.split('-');
-                    let result = '';
+                    // 将文本转换为Base64
+                    const base64 = btoa(unescape(encodeURIComponent(text)));
                     
-                    for (let i = 0; i < segments.length; i++) {
-                        const segment = segments[i];
-                        if (segment === '') {
-                            result += ' ';
-                            continue;
-                        }
-                        
-                        // 将基于允许字符集的表示转换回Unicode编码
-                        let code = 0;
-                        for (let j = 0; j < segment.length; j++) {
-                            const char = segment[j];
-                            const index = allowedChars.indexOf(char);
-                            if (index === -1) {
-                                throw new Error('无效字符: ' + char);
-                            }
-                            code = code * allowedChars.length + index;
-                        }
-                        
-                        // 将Unicode编码转换回字符
-                        result += String.fromCharCode(code);
+                    // 将Base64字符映射到允许的字符集
+                    let result = '';
+                    for (let i = 0; i < base64.length; i++) {
+                        const char = base64[i];
+                        // 使用简单的字符映射
+                        const index = char.charCodeAt(0) % allowedChars.length;
+                        result += allowedChars[index];
                     }
                     
                     return result;
                 } catch (e) {
-                    return '解密失败: ' + e.message;
+                    return '加密失败：' + e.message;
+                }
+            }
+            
+            // 修复的解密函数
+            function restoreText(text) {
+                try {
+                    // 检查输入是否只包含允许的字符
+                    for (let i = 0; i < text.length; i++) {
+                        if (!allowedChars.includes(text[i])) {
+                            return '解密失败：包含无效字符';
+                        }
+                    }
+                    
+                    // 将加密文本映射回Base64
+                    let base64 = '';
+                    for (let i = 0; i < text.length; i++) {
+                        const char = text[i];
+                        const index = allowedChars.indexOf(char);
+                        
+                        // 由于原始映射使用了模运算，我们需要找到可能的原始Base64字符
+                        // Base64字符范围是A-Z, a-z, 0-9, +, /, =
+                        const base64Chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
+                        
+                        // 找到与当前索引对应的Base64字符
+                        let found = false;
+                        for (let j = 0; j < base64Chars.length; j++) {
+                            if (j % allowedChars.length === index) {
+                                base64 += base64Chars[j];
+                                found = true;
+                                break;
+                            }
+                        }
+                        
+                        if (!found) {
+                            return '解密失败：无法映射字符';
+                        }
+                    }
+                    
+                    // 将Base64解码为原始文本
+                    return decodeURIComponent(escape(atob(base64)));
+                } catch (e) {
+                    return '解密失败：' + e.message;
                 }
             }
             
@@ -389,6 +384,9 @@
                 outputText.value = '';
                 inputText.focus();
             });
+            
+            // 初始激活第一个渐变
+            gradients[0].classList.add('active');
         });
     </script>
 </body>
