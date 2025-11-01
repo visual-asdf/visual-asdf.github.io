@@ -13,9 +13,9 @@
         }
         
         body {
-            background: linear-gradient(-45deg, #11998e, #38ef7d, #2193b0, #6dd5ed);
+            background: linear-gradient(-45deg, #ff006e, #8338ec, #3a86ff, #38b000, #ff9e00);
             background-size: 400% 400%;
-            animation: gradientShift 15s ease infinite;
+            animation: gradientFlow 10s ease infinite;
             color: #333;
             min-height: 100vh;
             display: flex;
@@ -24,15 +24,24 @@
             padding: 20px;
         }
         
-        @keyframes gradientShift {
+        @keyframes gradientFlow {
             0% {
                 background-position: 0% 50%;
+                filter: hue-rotate(0deg);
+            }
+            25% {
+                background-position: 50% 100%;
             }
             50% {
                 background-position: 100% 50%;
+                filter: hue-rotate(180deg);
+            }
+            75% {
+                background-position: 50% 0%;
             }
             100% {
                 background-position: 0% 50%;
+                filter: hue-rotate(360deg);
             }
         }
         
@@ -46,7 +55,7 @@
         }
         
         header {
-            background: linear-gradient(to right, #11998e, #38ef7d);
+            background: linear-gradient(to right, #ff006e, #8338ec);
             color: white;
             padding: 25px;
             text-align: center;
@@ -93,9 +102,9 @@
         
         textarea:focus {
             outline: none;
-            border-color: #11998e;
+            border-color: #8338ec;
             background-color: #fff;
-            box-shadow: 0 0 0 3px rgba(17, 153, 142, 0.1);
+            box-shadow: 0 0 0 3px rgba(131, 56, 236, 0.1);
         }
         
         .output-group textarea {
@@ -122,12 +131,12 @@
         }
         
         #processBtn {
-            background: linear-gradient(to right, #11998e, #38ef7d);
+            background: linear-gradient(to right, #ff006e, #8338ec);
             color: white;
         }
         
         #restoreBtn {
-            background: linear-gradient(to right, #38ef7d, #11998e);
+            background: linear-gradient(to right, #3a86ff, #38b000);
             color: white;
         }
         
@@ -204,7 +213,7 @@
             const restoreBtn = document.getElementById('restoreBtn');
             const clearBtn = document.getElementById('clearBtn');
             
-            // 增强的字符处理函数
+            // 修复的字符处理函数
             function processText(text) {
                 let result = '';
                 for (let i = 0; i < text.length; i++) {
@@ -219,23 +228,23 @@
                     // 获取字符的Unicode编码
                     const code = text.charCodeAt(i);
                     
-                    // 使用多层变换增强安全性
+                    // 使用改进的变换算法，避免编码越界
                     let transformedCode = code;
                     
                     // 第一层变换：基于位置的异或操作
-                    transformedCode ^= (i % 256);
+                    transformedCode ^= (i % 128) + 1; // 限制范围
                     
-                    // 第二层变换：质数乘法
-                    transformedCode = (transformedCode * 65537) % 65536;
+                    // 第二层变换：加法变换
+                    transformedCode = (transformedCode + 1234) % 65536;
                     
-                    // 第三层变换：位旋转
-                    transformedCode = ((transformedCode << 5) | (transformedCode >>> 11)) & 0xFFFF;
-                    
-                    // 第四层变换：添加固定盐值
-                    transformedCode = (transformedCode + 12345) % 65536;
+                    // 第三层变换：位交换
+                    const high = (transformedCode & 0xFF00) >> 8;
+                    const low = transformedCode & 0xFF;
+                    transformedCode = (low << 8) | high;
                     
                     // 确保编码在有效范围内
                     if (transformedCode < 0) transformedCode += 65536;
+                    if (transformedCode > 65535) transformedCode %= 65536;
                     
                     result += String.fromCharCode(transformedCode);
                 }
@@ -257,21 +266,20 @@
                     // 获取字符的Unicode编码
                     let code = text.charCodeAt(i);
                     
-                    // 逆向第四层变换：减去固定盐值
-                    code = (code - 12345 + 65536) % 65536;
+                    // 逆向第三层变换：位交换
+                    const high = (code & 0xFF00) >> 8;
+                    const low = code & 0xFF;
+                    code = (low << 8) | high;
                     
-                    // 逆向第三层变换：反向位旋转
-                    code = ((code >>> 5) | (code << 11)) & 0xFFFF;
+                    // 逆向第二层变换：减法变换
+                    code = (code - 1234 + 65536) % 65536;
                     
-                    // 逆向第二层变换：乘以模逆元
-                    // 65537在模65536下的逆元是自身，因为65537*65537 ≡ 1 (mod 65536)
-                    code = (code * 65537) % 65536;
-                    
-                    // 逆向第一层变换：基于位置的异或操作（异或操作是可逆的）
-                    code ^= (i % 256);
+                    // 逆向第一层变换：基于位置的异或操作
+                    code ^= (i % 128) + 1;
                     
                     // 确保编码在有效范围内
                     if (code < 0) code += 65536;
+                    if (code > 65535) code %= 65536;
                     
                     result += String.fromCharCode(code);
                 }
