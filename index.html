@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>文本加密程序</title>
+    <title>文本处理程序</title>
     <style>
         * {
             margin: 0;
@@ -13,13 +13,14 @@
         }
         
         body {
-            background: linear-gradient(135deg, #6a82fb, #fc5c7d);
+            background: linear-gradient(135deg, #11998e, #38ef7d);
             color: #333;
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
             padding: 20px;
+            transition: background 1.5s ease;
         }
         
         .container {
@@ -32,10 +33,11 @@
         }
         
         header {
-            background: linear-gradient(to right, #6a82fb, #fc5c7d);
+            background: linear-gradient(to right, #11998e, #38ef7d);
             color: white;
             padding: 25px;
             text-align: center;
+            transition: background 1.5s ease;
         }
         
         h1 {
@@ -79,9 +81,9 @@
         
         textarea:focus {
             outline: none;
-            border-color: #6a82fb;
+            border-color: #11998e;
             background-color: #fff;
-            box-shadow: 0 0 0 3px rgba(106, 130, 251, 0.1);
+            box-shadow: 0 0 0 3px rgba(17, 153, 142, 0.1);
         }
         
         .output-group textarea {
@@ -107,14 +109,16 @@
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
         
-        #encryptBtn {
-            background: linear-gradient(to right, #6a82fb, #7b91fc);
+        #processBtn {
+            background: linear-gradient(to right, #11998e, #38ef7d);
             color: white;
+            transition: background 1.5s ease;
         }
         
-        #decryptBtn {
-            background: linear-gradient(to right, #fc5c7d, #fd768f);
+        #restoreBtn {
+            background: linear-gradient(to right, #38ef7d, #11998e);
             color: white;
+            transition: background 1.5s ease;
         }
         
         #clearBtn {
@@ -154,7 +158,7 @@
 <body>
     <div class="container">
         <header>
-            <h1>文本加密程序</h1>
+            <h1>文本处理程序</h1>
             <p class="subtitle">安全可靠的文本处理工具</p>
         </header>
         
@@ -165,8 +169,8 @@
             </div>
             
             <div class="button-group">
-                <button id="encryptBtn">加密文本</button>
-                <button id="decryptBtn">解密文本</button>
+                <button id="processBtn">处理文本</button>
+                <button id="restoreBtn">还原文本</button>
                 <button id="clearBtn">清空内容</button>
             </div>
             
@@ -177,7 +181,7 @@
         </div>
         
         <footer>
-            <p>© 2025 文本加密程序 |Zhang Jiayi made| 简洁 · 高效 · 安全</p>
+            <p>© 2025 文本处理程序 | Zhang Jiayi</p>
         </footer>
     </div>
 
@@ -185,71 +189,128 @@
         document.addEventListener('DOMContentLoaded', function() {
             const inputText = document.getElementById('inputText');
             const outputText = document.getElementById('outputText');
-            const encryptBtn = document.getElementById('encryptBtn');
-            const decryptBtn = document.getElementById('decryptBtn');
+            const processBtn = document.getElementById('processBtn');
+            const restoreBtn = document.getElementById('restoreBtn');
             const clearBtn = document.getElementById('clearBtn');
             
-            // 加密函数
-            function encrypt(text) {
+            // 渐变颜色变化函数
+            function updateGradient() {
+                const now = new Date();
+                const seconds = now.getSeconds();
+                const percent = (seconds % 30) / 30; // 每30秒一个循环
+                
+                // 在绿蓝渐变范围内变化
+                const hueShift = percent * 60; // 在60度色相范围内变化
+                const startHue = (120 + hueShift) % 360; // 起始绿色
+                const endHue = (180 + hueShift) % 360; // 结束蓝色
+                
+                // 转换为HSL颜色
+                const startColor = `hsl(${startHue}, 70%, 45%)`;
+                const endColor = `hsl(${endHue}, 70%, 55%)`;
+                
+                // 应用渐变
+                document.body.style.background = `linear-gradient(135deg, ${startColor}, ${endColor})`;
+                document.querySelector('header').style.background = `linear-gradient(to right, ${startColor}, ${endColor})`;
+                processBtn.style.background = `linear-gradient(to right, ${startColor}, ${endColor})`;
+                restoreBtn.style.background = `linear-gradient(to right, ${endColor}, ${startColor})`;
+            }
+            
+            // 每2秒更新一次渐变，减少性能消耗
+            setInterval(updateGradient, 2000);
+            updateGradient(); // 初始调用
+            
+            // 增强的字符处理函数
+            function processText(text) {
                 let result = '';
                 for (let i = 0; i < text.length; i++) {
-                    if (text[i] === ' ') {
+                    const char = text[i];
+                    
+                    // 空格保持不变
+                    if (char === ' ') {
                         result += ' ';
-                    } else {
-                        // 使用多层变换增加复杂性
-                        let code = text.charCodeAt(i);
-                        // 第一层变换
-                        code = (code * 3) % 65536;
-                        // 第二层变换
-                        code = code ^ 0x55AA;
-                        // 第三层变换
-                        code = (code + 1234) % 65536;
-                        
-                        result += String.fromCharCode(code);
+                        continue;
                     }
+                    
+                    // 获取字符的Unicode编码
+                    const code = text.charCodeAt(i);
+                    
+                    // 使用多层变换增强安全性
+                    let transformedCode = code;
+                    
+                    // 第一层变换：基于位置的异或操作
+                    transformedCode ^= (i % 256);
+                    
+                    // 第二层变换：质数乘法
+                    transformedCode = (transformedCode * 65537) % 65536;
+                    
+                    // 第三层变换：位旋转
+                    transformedCode = ((transformedCode << 5) | (transformedCode >>> 11)) & 0xFFFF;
+                    
+                    // 第四层变换：添加固定盐值
+                    transformedCode = (transformedCode + 12345) % 65536;
+                    
+                    // 确保编码在有效范围内
+                    if (transformedCode < 0) transformedCode += 65536;
+                    
+                    result += String.fromCharCode(transformedCode);
                 }
                 return result;
             }
             
-            // 解密函数
-            function decrypt(text) {
+            // 还原文本函数
+            function restoreText(text) {
                 let result = '';
                 for (let i = 0; i < text.length; i++) {
-                    if (text[i] === ' ') {
+                    const char = text[i];
+                    
+                    // 空格保持不变
+                    if (char === ' ') {
                         result += ' ';
-                    } else {
-                        let code = text.charCodeAt(i);
-                        // 逆向第三层变换
-                        code = (code - 1234 + 65536) % 65536;
-                        // 逆向第二层变换
-                        code = code ^ 0x55AA;
-                        // 逆向第一层变换
-                        code = (code * 21845) % 65536; // 21845是3的模65536逆元
-                        
-                        result += String.fromCharCode(code);
+                        continue;
                     }
+                    
+                    // 获取字符的Unicode编码
+                    let code = text.charCodeAt(i);
+                    
+                    // 逆向第四层变换：减去固定盐值
+                    code = (code - 12345 + 65536) % 65536;
+                    
+                    // 逆向第三层变换：反向位旋转
+                    code = ((code >>> 5) | (code << 11)) & 0xFFFF;
+                    
+                    // 逆向第二层变换：乘以模逆元
+                    // 65537在模65536下的逆元是自身，因为65537*65537 ≡ 1 (mod 65536)
+                    code = (code * 65537) % 65536;
+                    
+                    // 逆向第一层变换：基于位置的异或操作（异或操作是可逆的）
+                    code ^= (i % 256);
+                    
+                    // 确保编码在有效范围内
+                    if (code < 0) code += 65536;
+                    
+                    result += String.fromCharCode(code);
                 }
                 return result;
             }
             
-            // 加密按钮事件
-            encryptBtn.addEventListener('click', function() {
+            // 处理按钮事件
+            processBtn.addEventListener('click', function() {
                 const text = inputText.value;
                 if (text.trim() === '') {
                     outputText.value = '请输入要处理的文本内容';
                     return;
                 }
-                outputText.value = encrypt(text);
+                outputText.value = processText(text);
             });
             
-            // 解密按钮事件
-            decryptBtn.addEventListener('click', function() {
+            // 还原按钮事件
+            restoreBtn.addEventListener('click', function() {
                 const text = inputText.value;
                 if (text.trim() === '') {
                     outputText.value = '请输入要处理的文本内容';
                     return;
                 }
-                outputText.value = decrypt(text);
+                outputText.value = restoreText(text);
             });
             
             // 清空按钮事件
@@ -261,4 +322,4 @@
         });
     </script>
 </body>
-</html>
+    </html>
