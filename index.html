@@ -13,14 +13,27 @@
         }
         
         body {
-            background: linear-gradient(135deg, #11998e, #38ef7d);
+            background: linear-gradient(-45deg, #11998e, #38ef7d, #2193b0, #6dd5ed);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
             color: #333;
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
             padding: 20px;
-            transition: background 1.5s ease;
+        }
+        
+        @keyframes gradientShift {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
         }
         
         .container {
@@ -37,7 +50,6 @@
             color: white;
             padding: 25px;
             text-align: center;
-            transition: background 1.5s ease;
         }
         
         h1 {
@@ -112,13 +124,11 @@
         #processBtn {
             background: linear-gradient(to right, #11998e, #38ef7d);
             color: white;
-            transition: background 1.5s ease;
         }
         
         #restoreBtn {
             background: linear-gradient(to right, #38ef7d, #11998e);
             color: white;
-            transition: background 1.5s ease;
         }
         
         #clearBtn {
@@ -147,10 +157,11 @@
         @media (max-width: 600px) {
             .button-group {
                 flex-direction: column;
+                align-items: center;
             }
             
             button {
-                width: 100%;
+                width: 80%;
             }
         }
     </style>
@@ -181,7 +192,7 @@
         </div>
         
         <footer>
-            <p>© 2025 文本处理程序 | Zhang Jiayi</p>
+            <p>© 2025 文本处理程序 | 专业 · 可靠 · 安全</p>
         </footer>
     </div>
 
@@ -192,32 +203,6 @@
             const processBtn = document.getElementById('processBtn');
             const restoreBtn = document.getElementById('restoreBtn');
             const clearBtn = document.getElementById('clearBtn');
-            
-            // 渐变颜色变化函数
-            function updateGradient() {
-                const now = new Date();
-                const seconds = now.getSeconds();
-                const percent = (seconds % 30) / 30; // 每30秒一个循环
-                
-                // 在绿蓝渐变范围内变化
-                const hueShift = percent * 60; // 在60度色相范围内变化
-                const startHue = (120 + hueShift) % 360; // 起始绿色
-                const endHue = (180 + hueShift) % 360; // 结束蓝色
-                
-                // 转换为HSL颜色
-                const startColor = `hsl(${startHue}, 70%, 45%)`;
-                const endColor = `hsl(${endHue}, 70%, 55%)`;
-                
-                // 应用渐变
-                document.body.style.background = `linear-gradient(135deg, ${startColor}, ${endColor})`;
-                document.querySelector('header').style.background = `linear-gradient(to right, ${startColor}, ${endColor})`;
-                processBtn.style.background = `linear-gradient(to right, ${startColor}, ${endColor})`;
-                restoreBtn.style.background = `linear-gradient(to right, ${endColor}, ${startColor})`;
-            }
-            
-            // 每2秒更新一次渐变，减少性能消耗
-            setInterval(updateGradient, 2000);
-            updateGradient(); // 初始调用
             
             // 增强的字符处理函数
             function processText(text) {
@@ -322,4 +307,4 @@
         });
     </script>
 </body>
-    </html>
+</html>
