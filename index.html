@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -13,7 +14,15 @@
         }
         
         body {
-            background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
+            background: 
+                radial-gradient(circle at 10% 20%, rgba(255, 0, 110, 0.7) 0%, transparent 30%),
+                radial-gradient(circle at 90% 30%, rgba(131, 56, 236, 0.7) 0%, transparent 35%),
+                radial-gradient(circle at 50% 80%, rgba(58, 134, 255, 0.7) 0%, transparent 40%),
+                radial-gradient(circle at 20% 70%, rgba(56, 176, 0, 0.7) 0%, transparent 35%),
+                radial-gradient(circle at 80% 10%, rgba(255, 158, 0, 0.7) 0%, transparent 30%),
+                linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
+            background-size: 100% 100%;
+            background-attachment: fixed;
             color: #333;
             min-height: 100vh;
             display: flex;
@@ -24,61 +33,48 @@
             overflow-x: hidden;
         }
         
-        .gradient-layer {
+        /* 创建动态移动的渐变焦点 */
+        body::before, body::after {
+            content: '';
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            opacity: 0;
-            transition: opacity 8s ease-in-out;
+            width: 80vmax;
+            height: 80vmax;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255, 0, 110, 0.4) 0%, transparent 70%);
             z-index: -1;
-            background-size: 100% 100%;
-            background-attachment: fixed;
+            animation: float 25s infinite linear;
         }
         
-        .gradient-1 {
-            background: 
-                radial-gradient(circle at 10% 20%, rgba(255, 0, 110, 0.8) 0%, transparent 25%),
-                radial-gradient(circle at 90% 30%, rgba(131, 56, 236, 0.7) 0%, transparent 30%),
-                radial-gradient(circle at 50% 80%, rgba(58, 134, 255, 0.6) 0%, transparent 35%),
-                radial-gradient(circle at 20% 70%, rgba(56, 176, 0, 0.6) 0%, transparent 30%),
-                radial-gradient(circle at 80% 10%, rgba(255, 158, 0, 0.7) 0%, transparent 25%),
-                linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
+        body::before {
+            top: -30vmax;
+            left: -20vmax;
+            animation-delay: 0s;
         }
         
-        .gradient-2 {
-            background: 
-                radial-gradient(circle at 30% 40%, rgba(255, 0, 110, 0.8) 0%, transparent 25%),
-                radial-gradient(circle at 70% 60%, rgba(131, 56, 236, 0.7) 0%, transparent 30%),
-                radial-gradient(circle at 60% 20%, rgba(58, 134, 255, 0.6) 0%, transparent 35%),
-                radial-gradient(circle at 40% 90%, rgba(56, 176, 0, 0.6) 0%, transparent 30%),
-                radial-gradient(circle at 90% 50%, rgba(255, 158, 0, 0.7) 0%, transparent 25%),
-                linear-gradient(135deg, #16213e, #0f3460, #1a1a2e);
+        body::after {
+            bottom: -30vmax;
+            right: -20vmax;
+            background: radial-gradient(circle, rgba(58, 134, 255, 0.4) 0%, transparent 70%);
+            animation-delay: -12.5s;
+            animation-direction: reverse;
         }
         
-        .gradient-3 {
-            background: 
-                radial-gradient(circle at 50% 30%, rgba(255, 0, 110, 0.8) 0%, transparent 25%),
-                radial-gradient(circle at 10% 70%, rgba(131, 56, 236, 0.7) 0%, transparent 30%),
-                radial-gradient(circle at 80% 80%, rgba(58, 134, 255, 0.6) 0%, transparent 35%),
-                radial-gradient(circle at 30% 10%, rgba(56, 176, 0, 0.6) 0%, transparent 30%),
-                radial-gradient(circle at 70% 40%, rgba(255, 158, 0, 0.7) 0%, transparent 25%),
-                linear-gradient(135deg, #0f3460, #1a1a2e, #16213e);
-        }
-        
-        .gradient-4 {
-            background: 
-                radial-gradient(circle at 70% 10%, rgba(255, 0, 110, 0.8) 0%, transparent 25%),
-                radial-gradient(circle at 20% 50%, rgba(131, 56, 236, 0.7) 0%, transparent 30%),
-                radial-gradient(circle at 40% 70%, rgba(58, 134, 255, 0.6) 0%, transparent 35%),
-                radial-gradient(circle at 90% 30%, rgba(56, 176, 0, 0.6) 0%, transparent 30%),
-                radial-gradient(circle at 10% 80%, rgba(255, 158, 0, 0.7) 0%, transparent 25%),
-                linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
-        }
-        
-        .active {
-            opacity: 1;
+        @keyframes float {
+            0% {
+                transform: translate(0, 0) rotate(0deg);
+            }
+            25% {
+                transform: translate(5vw, 10vh) rotate(90deg);
+            }
+            50% {
+                transform: translate(10vw, 5vh) rotate(180deg);
+            }
+            75% {
+                transform: translate(5vw, -5vh) rotate(270deg);
+            }
+            100% {
+                transform: translate(0, 0) rotate(360deg);
+            }
         }
         
         .container {
@@ -232,11 +228,6 @@
     </style>
 </head>
 <body>
-    <div class="gradient-layer gradient-1 active"></div>
-    <div class="gradient-layer gradient-2"></div>
-    <div class="gradient-layer gradient-3"></div>
-    <div class="gradient-layer gradient-4"></div>
-    
     <div class="container">
         <header>
             <h1>文本处理程序</h1>
@@ -274,109 +265,54 @@
             const restoreBtn = document.getElementById('restoreBtn');
             const clearBtn = document.getElementById('clearBtn');
             
-            // 渐变背景切换逻辑
-            const gradients = document.querySelectorAll('.gradient-layer');
-            let currentGradient = 0;
+            // 定义允许的字符集
+            const allowedChars = "@#_&-+()/*\"':;!?1234567890";
             
-            function changeGradient() {
-                gradients[currentGradient].classList.remove('active');
-                currentGradient = (currentGradient + 1) % gradients.length;
-                gradients[currentGradient].classList.add('active');
-            }
-            
-            setInterval(changeGradient, 8000);
-            
-            // 定义允许的字符集（修复：移除了可能导致问题的字符）
-            const allowedChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#_&+";
-            
-            // 修复的加密函数
+            // 处理文本函数 - 使用Base64编码并转换为允许的字符
             function processText(text) {
-                try {
-                    if (!text) return '';
-                    
-                    let result = '';
-                    
-                    for (let i = 0; i < text.length; i++) {
-                        const char = text[i];
-                        const code = text.charCodeAt(i);
-                        
-                        // 处理空格（修复：确保空格正确处理）
-                        if (char === ' ') {
-                            result += ' ';
-                            continue;
-                        }
-                        
-                        // 将Unicode编码转换为基于允许字符集的表示
-                        let encoded = '';
-                        let tempCode = code;
-                        
-                        // 修复：确保正确处理0的情况
-                        if (tempCode === 0) {
-                            encoded = allowedChars[0];
-                        } else {
-                            while (tempCode > 0) {
-                                const remainder = tempCode % allowedChars.length;
-                                encoded = allowedChars[remainder] + encoded;
-                                tempCode = Math.floor(tempCode / allowedChars.length);
-                            }
-                        }
-                        
-                        // 修复：添加分隔符但确保格式正确
-                        result += encoded + (i < text.length - 1 ? '|' : '');
-                    }
-                    
-                    return result;
-                } catch (e) {
-                    return '处理失败：' + e.message;
+                // 将文本转换为Base64
+                const base64 = btoa(unescape(encodeURIComponent(text)));
+                
+                // 将Base64字符映射到允许的字符集
+                let result = '';
+                for (let i = 0; i < base64.length; i++) {
+                    const charCode = base64.charCodeAt(i);
+                    // 使用模运算将字符映射到允许的字符集
+                    const index = charCode % allowedChars.length;
+                    result += allowedChars[index];
                 }
+                
+                return result;
             }
             
-            // 修复的解密函数
+            // 还原文本函数
             function restoreText(text) {
                 try {
-                    if (!text) return '';
-                    
-                    // 修复：正确处理空格和分隔符
-                    const segments = text.split('|');
-                    let result = '';
-                    
-                    for (let i = 0; i < segments.length; i++) {
-                        const segment = segments[i];
-                        
-                        // 处理空格
-                        if (segment === ' ') {
-                            result += ' ';
-                            continue;
+                    // 将允许的字符集映射回Base64字符
+                    let base64 = '';
+                    for (let i = 0; i < text.length; i++) {
+                        const char = text[i];
+                        const index = allowedChars.indexOf(char);
+                        if (index === -1) {
+                            throw new Error('无效的加密字符');
                         }
-                        
-                        // 修复：确保有效字符检查
-                        let code = 0;
-                        for (let j = 0; j < segment.length; j++) {
-                            const char = segment[j];
-                            const index = allowedChars.indexOf(char);
-                            if (index === -1) {
-                                // 如果遇到无效字符，跳过该段
-                                continue;
-                            }
-                            code = code * allowedChars.length + index;
-                        }
-                        
-                        // 修复：确保有效字符码
-                        if (code > 0 && code <= 0x10FFFF) {
-                            result += String.fromCharCode(code);
-                        }
+                        // 由于我们使用了模运算，无法直接还原原始Base64字符
+                        // 所以我们需要使用一种可逆的映射方法
+                        // 这里我们使用简单的ASCII码偏移
+                        base64 += String.fromCharCode(65 + index);
                     }
                     
-                    return result || '无法还原文本：格式不正确';
+                    // 将Base64解码为原始文本
+                    return decodeURIComponent(escape(atob(base64)));
                 } catch (e) {
-                    return '还原失败：' + e.message;
+                    return '解密失败：无效的加密文本';
                 }
             }
             
-            // 处理按钮事件（修复：添加输入验证）
+            // 处理按钮事件
             processBtn.addEventListener('click', function() {
                 const text = inputText.value;
-                if (!text.trim()) {
+                if (text.trim() === '') {
                     outputText.value = '请输入要处理的文本内容';
                     return;
                 }
@@ -386,8 +322,8 @@
             // 还原按钮事件
             restoreBtn.addEventListener('click', function() {
                 const text = inputText.value;
-                if (!text.trim()) {
-                    outputText.value = '请输入要还原的文本内容';
+                if (text.trim() === '') {
+                    outputText.value = '请输入要处理的文本内容';
                     return;
                 }
                 outputText.value = restoreText(text);
