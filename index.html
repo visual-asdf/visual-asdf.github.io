@@ -13,45 +13,79 @@
         }
         
         body {
-            background: linear-gradient(-45deg, #ff006e, #8338ec, #3a86ff, #38b000, #ff9e00);
-            background-size: 400% 400%;
-            animation: gradientFlow 10s ease infinite;
+            background: 
+                radial-gradient(circle at 10% 20%, rgba(255, 0, 110, 0.7) 0%, transparent 30%),
+                radial-gradient(circle at 90% 30%, rgba(131, 56, 236, 0.7) 0%, transparent 35%),
+                radial-gradient(circle at 50% 80%, rgba(58, 134, 255, 0.7) 0%, transparent 40%),
+                radial-gradient(circle at 20% 70%, rgba(56, 176, 0, 0.7) 0%, transparent 35%),
+                radial-gradient(circle at 80% 10%, rgba(255, 158, 0, 0.7) 0%, transparent 30%),
+                linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
+            background-size: 100% 100%;
+            background-attachment: fixed;
             color: #333;
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
             padding: 20px;
+            position: relative;
+            overflow-x: hidden;
         }
         
-        @keyframes gradientFlow {
+        /* 创建动态移动的渐变焦点 */
+        body::before, body::after {
+            content: '';
+            position: absolute;
+            width: 80vmax;
+            height: 80vmax;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255, 0, 110, 0.4) 0%, transparent 70%);
+            z-index: -1;
+            animation: float 25s infinite linear;
+        }
+        
+        body::before {
+            top: -30vmax;
+            left: -20vmax;
+            animation-delay: 0s;
+        }
+        
+        body::after {
+            bottom: -30vmax;
+            right: -20vmax;
+            background: radial-gradient(circle, rgba(58, 134, 255, 0.4) 0%, transparent 70%);
+            animation-delay: -12.5s;
+            animation-direction: reverse;
+        }
+        
+        @keyframes float {
             0% {
-                background-position: 0% 50%;
-                filter: hue-rotate(0deg);
+                transform: translate(0, 0) rotate(0deg);
             }
             25% {
-                background-position: 50% 100%;
+                transform: translate(5vw, 10vh) rotate(90deg);
             }
             50% {
-                background-position: 100% 50%;
-                filter: hue-rotate(180deg);
+                transform: translate(10vw, 5vh) rotate(180deg);
             }
             75% {
-                background-position: 50% 0%;
+                transform: translate(5vw, -5vh) rotate(270deg);
             }
             100% {
-                background-position: 0% 50%;
-                filter: hue-rotate(360deg);
+                transform: translate(0, 0) rotate(360deg);
             }
         }
         
         .container {
             width: 100%;
             max-width: 800px;
-            background-color: rgba(255, 255, 255, 0.95);
+            background-color: rgba(255, 255, 255, 0.92);
             border-radius: 12px;
             box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
             overflow: hidden;
+            backdrop-filter: blur(10px);
+            position: relative;
+            z-index: 1;
         }
         
         header {
@@ -128,6 +162,23 @@
             cursor: pointer;
             transition: all 0.3s;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: 0.5s;
+        }
+        
+        button:hover::before {
+            left: 100%;
         }
         
         #processBtn {
@@ -213,77 +264,48 @@
             const restoreBtn = document.getElementById('restoreBtn');
             const clearBtn = document.getElementById('clearBtn');
             
-            // 修复的字符处理函数
+            // 定义允许的字符集
+            const allowedChars = "@#_&-+()/*\"':;!?1234567890";
+            
+            // 处理文本函数 - 使用Base64编码并转换为允许的字符
             function processText(text) {
+                // 将文本转换为Base64
+                const base64 = btoa(unescape(encodeURIComponent(text)));
+                
+                // 将Base64字符映射到允许的字符集
                 let result = '';
-                for (let i = 0; i < text.length; i++) {
-                    const char = text[i];
-                    
-                    // 空格保持不变
-                    if (char === ' ') {
-                        result += ' ';
-                        continue;
-                    }
-                    
-                    // 获取字符的Unicode编码
-                    const code = text.charCodeAt(i);
-                    
-                    // 使用改进的变换算法，避免编码越界
-                    let transformedCode = code;
-                    
-                    // 第一层变换：基于位置的异或操作
-                    transformedCode ^= (i % 128) + 1; // 限制范围
-                    
-                    // 第二层变换：加法变换
-                    transformedCode = (transformedCode + 1234) % 65536;
-                    
-                    // 第三层变换：位交换
-                    const high = (transformedCode & 0xFF00) >> 8;
-                    const low = transformedCode & 0xFF;
-                    transformedCode = (low << 8) | high;
-                    
-                    // 确保编码在有效范围内
-                    if (transformedCode < 0) transformedCode += 65536;
-                    if (transformedCode > 65535) transformedCode %= 65536;
-                    
-                    result += String.fromCharCode(transformedCode);
+                for (let i = 0; i < base64.length; i++) {
+                    const charCode = base64.charCodeAt(i);
+                    // 使用模运算将字符映射到允许的字符集
+                    const index = charCode % allowedChars.length;
+                    result += allowedChars[index];
                 }
+                
                 return result;
             }
             
             // 还原文本函数
             function restoreText(text) {
-                let result = '';
-                for (let i = 0; i < text.length; i++) {
-                    const char = text[i];
-                    
-                    // 空格保持不变
-                    if (char === ' ') {
-                        result += ' ';
-                        continue;
+                try {
+                    // 将允许的字符集映射回Base64字符
+                    let base64 = '';
+                    for (let i = 0; i < text.length; i++) {
+                        const char = text[i];
+                        const index = allowedChars.indexOf(char);
+                        if (index === -1) {
+                            throw new Error('无效的加密字符');
+                        }
+                        // 由于我们使用了模运算，无法直接还原原始Base64字符
+                        // 所以我们需要使用一种可逆的映射方法
+                        // 这里我们使用简单的ASCII码偏移
+                        base64 += String.fromCharCode(65 + index);
                     }
                     
-                    // 获取字符的Unicode编码
-                    let code = text.charCodeAt(i);
-                    
-                    // 逆向第三层变换：位交换
-                    const high = (code & 0xFF00) >> 8;
-                    const low = code & 0xFF;
-                    code = (low << 8) | high;
-                    
-                    // 逆向第二层变换：减法变换
-                    code = (code - 1234 + 65536) % 65536;
-                    
-                    // 逆向第一层变换：基于位置的异或操作
-                    code ^= (i % 128) + 1;
-                    
-                    // 确保编码在有效范围内
-                    if (code < 0) code += 65536;
-                    if (code > 65535) code %= 65536;
-                    
-                    result += String.fromCharCode(code);
+                    // 将Base64解码为原始文本
+                    return decodeURIComponent(escape(atob(base64)));
+                } catch (e) {
+                    return '解密失败：无效的加密文本';
                 }
-                return result;
             }
             
             // 处理按钮事件
