@@ -295,64 +295,76 @@
             // 定义允许的字符集
             const allowedChars = "@#_&-+()/*\"':;!?1234567890";
             
-            // 修复的加密函数 - 使用Base64和字符映射
+            // 简单可靠的加密函数
             function processText(text) {
                 try {
-                    // 将文本转换为Base64
-                    const base64 = btoa(unescape(encodeURIComponent(text)));
-                    
-                    // 将Base64字符映射到允许的字符集
                     let result = '';
-                    for (let i = 0; i < base64.length; i++) {
-                        const char = base64[i];
-                        // 使用简单的字符映射
-                        const index = char.charCodeAt(0) % allowedChars.length;
-                        result += allowedChars[index];
+                    
+                    for (let i = 0; i < text.length; i++) {
+                        const char = text[i];
+                        
+                        // 空格保持不变
+                        if (char === ' ') {
+                            result += ' ';
+                            continue;
+                        }
+                        
+                        // 获取字符的Unicode编码
+                        const code = text.charCodeAt(i);
+                        
+                        // 将Unicode编码转换为基于允许字符集的表示
+                        let encoded = '';
+                        let tempCode = code;
+                        
+                        do {
+                            const remainder = tempCode % allowedChars.length;
+                            encoded = allowedChars[remainder] + encoded;
+                            tempCode = Math.floor(tempCode / allowedChars.length);
+                        } while (tempCode > 0);
+                        
+                        // 添加分隔符确保可逆性
+                        result += encoded + '-';
                     }
                     
-                    return result;
+                    // 移除最后一个分隔符
+                    return result.slice(0, -1);
                 } catch (e) {
                     return '加密失败：' + e.message;
                 }
             }
             
-            // 修复的解密函数
+            // 简单可靠的解密函数
             function restoreText(text) {
                 try {
-                    // 检查输入是否只包含允许的字符
-                    for (let i = 0; i < text.length; i++) {
-                        if (!allowedChars.includes(text[i])) {
-                            return '解密失败：包含无效字符';
-                        }
-                    }
+                    // 分割编码后的字符串
+                    const segments = text.split('-');
+                    let result = '';
                     
-                    // 将加密文本映射回Base64
-                    let base64 = '';
-                    for (let i = 0; i < text.length; i++) {
-                        const char = text[i];
-                        const index = allowedChars.indexOf(char);
+                    for (let i = 0; i < segments.length; i++) {
+                        const segment = segments[i];
                         
-                        // 由于原始映射使用了模运算，我们需要找到可能的原始Base64字符
-                        // Base64字符范围是A-Z, a-z, 0-9, +, /, =
-                        const base64Chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
+                        // 处理空格
+                        if (segment === '') {
+                            result += ' ';
+                            continue;
+                        }
                         
-                        // 找到与当前索引对应的Base64字符
-                        let found = false;
-                        for (let j = 0; j < base64Chars.length; j++) {
-                            if (j % allowedChars.length === index) {
-                                base64 += base64Chars[j];
-                                found = true;
-                                break;
+                        // 将基于允许字符集的表示转换回Unicode编码
+                        let code = 0;
+                        for (let j = 0; j < segment.length; j++) {
+                            const char = segment[j];
+                            const index = allowedChars.indexOf(char);
+                            if (index === -1) {
+                                return '解密失败：无效字符 "' + char + '"';
                             }
+                            code = code * allowedChars.length + index;
                         }
                         
-                        if (!found) {
-                            return '解密失败：无法映射字符';
-                        }
+                        // 将Unicode编码转换回字符
+                        result += String.fromCharCode(code);
                     }
                     
-                    // 将Base64解码为原始文本
-                    return decodeURIComponent(escape(atob(base64)));
+                    return result;
                 } catch (e) {
                     return '解密失败：' + e.message;
                 }
